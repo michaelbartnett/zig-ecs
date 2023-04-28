@@ -173,7 +173,7 @@ pub fn SparseSet(comptime SparseT: type) type {
         pub fn sort(self: *Self, context: anytype, comptime lessThan: *const fn (@TypeOf(context), SparseT, SparseT) bool) void {
             std_sort_insertionSort_clone(SparseT, self.dense.items, context, lessThan);
 
-            for (self.dense.items) |_, i| {
+            for (self.dense.items, 0..) |_, i| {
                 const item = @intCast(SparseT, i);
                 self.sparse.items[self.page(self.dense.items[self.page(item)])].?[self.offset(self.dense.items[self.page(item)])] = @intCast(SparseT, i);
             }
@@ -184,7 +184,7 @@ pub fn SparseSet(comptime SparseT: type) type {
         pub fn arrange(self: *Self, length: usize, context: anytype, comptime lessThan: *const fn (@TypeOf(context), SparseT, SparseT) bool, swap_context: anytype) void {
             std_sort_insertionSort_clone(SparseT, self.dense.items[0..length], context, lessThan);
 
-            for (self.dense.items[0..length]) |_, pos| {
+            for (self.dense.items[0..length], 0..) |_, pos| {
                 var curr = @intCast(SparseT, pos);
                 var next = self.index(self.dense.items[curr]);
 
@@ -213,7 +213,7 @@ pub fn SparseSet(comptime SparseT: type) type {
         }
 
         pub fn clear(self: *Self) void {
-            for (self.sparse.items) |array, i| {
+            for (self.sparse.items, 0..) |array, i| {
                 if (array) |arr| {
                     self.sparse.allocator.free(arr);
                     self.sparse.items[i] = null;
@@ -358,7 +358,7 @@ test "respect 2" {
 
     set.sort({}, desc_u32);
 
-    for (set.dense.items) |item, i| {
+    for (set.dense.items, 0..) |item, i| {
         if (i < set.dense.items.len - 1) {
             std.debug.assert(item > set.dense.items[i + 1]);
         }
